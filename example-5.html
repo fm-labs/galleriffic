@@ -383,6 +383,7 @@
 					navControlsContainerSel:   '#nav',
 					captionContainerSel:       '#caption',
 					loadingContainerSel:       '#loading',
+					photoContainerSel:         'div.photo-index',
 					renderSSControls:          true,
 					renderNavControls:         true,
 					playLinkText:              'Play Slideshow',
@@ -395,15 +396,14 @@
 					autoStart:                 false,
 					syncTransitions:           true,
 					defaultTransitionDuration: 900,
-					onSlideChange:             function(prevIndex, nextIndex) {
+					onSlideChangeOut:             function(prevIndex) {
 						// 'this' refers to the gallery, which is an extension of $('#thumbs')
 						this.find('ul.thumbs').children()
-							.eq(prevIndex).fadeTo('fast', onMouseOutOpacity).end()
+							.eq(prevIndex).fadeTo('fast', onMouseOutOpacity);
+					},
+					onSlideChangeIn:              function(nextIndex) {
+						this.find('ul.thumbs').children()
 							.eq(nextIndex).fadeTo('fast', 1.0);
-
-						// Update the photo index display
-						this.$captionContainer.find('div.photo-index')
-							.html('Photo '+ (nextIndex+1) +' of '+ this.data.length);
 					},
 					onPageTransitionOut:       function(callback) {
 						this.fadeTo('fast', 0.0, callback);

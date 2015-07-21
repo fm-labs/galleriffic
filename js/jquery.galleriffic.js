@@ -688,26 +688,28 @@
 						.click(function() {gallery.next()});
 				}
 
-				/* Change the size of slideshow-container dynamically */					
-				// Save actual image size so any rescaling we do now is reversible and doesn't alter later image loads
-				if (!imageData.image.trueWidth) { imageData.image.trueWidth = imageData.image.width; }
-				if (!imageData.image.trueHeight) { imageData.image.trueHeight = imageData.image.height; }
-                
-				var size = this.imageResize(imageData.image.trueWidth, imageData.image.trueHeight, $("#gallery").outerWidth()-this.imageBorderWidth);
-				//console.log("outerwidth: " + $("#gallery").outerWidth());
-                
-				imageData.image.width = size.width;
-				imageData.image.height = size.height;
-                
-				var cnWidth = size.width + this.imageBorderWidth; 
-				var cnHeight = size.height + this.imageBorderWidth;
-				//console.log("width: "+ cnWidth);
-				//console.log("height: "+ cnHeight);
-                
-				$(".slideshow").stop().animate({
-					height: cnHeight,
-					width: cnWidth
-				}, 1000);
+				/* Change the size of slideshow-container dynamically, if image is in a gallery */
+				if ($("#gallery").length>0) {
+					// Save actual image size so any rescaling we do now is reversible and doesn't alter later image loads
+					if (!imageData.image.trueWidth) { imageData.image.trueWidth = imageData.image.width; }
+					if (!imageData.image.trueHeight) { imageData.image.trueHeight = imageData.image.height; }
+					
+					var size = this.imageResize(imageData.image.trueWidth, imageData.image.trueHeight, $("#gallery").outerWidth()-this.imageBorderWidth);
+					//console.log("outerwidth: " + $("#gallery").outerWidth());
+					
+					imageData.image.width = size.width;
+					imageData.image.height = size.height;
+					
+					var cnWidth = size.width + this.imageBorderWidth; 
+					var cnHeight = size.height + this.imageBorderWidth;
+					//console.log("width: "+ cnWidth);
+					//console.log("height: "+ cnHeight);
+					
+					$(".slideshow").stop().animate({
+						height: cnHeight,
+						width: cnWidth
+					}, 1000); 
+				}
 				/* -------------------------------------------------- */
 
 				newSlide.find('a')
