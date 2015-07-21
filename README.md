@@ -3,11 +3,9 @@ Galleriffic - a jQuery photo gallery & slideshow plugin
 
 This is a fork of Galleriffic by Trent Foley. The original project can by found at http://www.twospy.com/galleriffic.
 
-There are some outstanding issues which haven't been resolved since 2008, so this is an attempt to resolve those issues as well as enhance the functionality of the plugin for personal use.
+Jay Hayes (http://iamvery.com) made some improvements. This is a fork from his changes (https://github.com/iamvery/galleriffic).
 
-Project modification by Jay Hayes (http://iamvery.com)
+This fork uses a responsive design to better adapt to differing browser sizes, has better support for mobiles,
+including touchSwipe support. It also fixes a number of outstanding issues.
 
-
-Integration with Fancybox
--------------------------
-Check out the Galleriffic integration with Fancybox (http://fancybox.net) at tag: v2.1.1.rc2
+The changes mirror what are used in the Gallerific Adobe Lightroom Web Gallery plugin (http://trialsandtravails.blogspot.com/2015/07/gallerific.html).
