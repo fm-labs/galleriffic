@@ -68,10 +68,10 @@ div#footer {
 	padding: 15px 0 30px;
 	text-align: center;
 }
-div.navigation a.prev {
+div.navigation a.pageLink.prev {
 	background-image: url(prevPageArrow.gif);
 }
-div.navigation a.next {
+div.navigation a.pageLink.next {
 	background-image: url(nextPageArrow.gif);
 }
 

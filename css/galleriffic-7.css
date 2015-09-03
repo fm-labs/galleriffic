@@ -102,7 +102,7 @@ div.download {
 	border: 1px solid #ccc;
 }
 div.caption-container {
-	position: relative;	 -- disabled for captionOverlay option to set
+	position: relative;
 	clear: left;
 	height: 10em;
 	max-height: 120px;
@@ -111,9 +111,9 @@ span.image-caption {
 	display: inline-block;
 	position: absolute;
 	max-height: 100px;
-/*	width: 100%; -- disabled for captionOverlay option to set
+	width: 100%;
 	top: 0;
-	left: 0; */
+	left: 0; 
 }
 div.caption {
 	padding: 1em;

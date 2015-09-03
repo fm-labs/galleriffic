@@ -9,6 +9,7 @@
 		<script type="text/javascript" src="js/jquery.history.js"></script>
 		<script type="text/javascript" src="js/jquery.galleriffic.js"></script>
 		<script type="text/javascript" src="js/jquery.opacityrollover.js"></script>
+		<script type="text/javascript" src="js/jquery.touchSwipe.min.js"></script>
 		<!-- We only want the thunbnails to display when javascript is disabled -->
 		<script type="text/javascript">
 			document.write('<style>.noscript { display: none; }</style>');
@@ -24,7 +25,7 @@
 		<div id="page">
 			<div id="container">
 				<h1><a href="index.html">Galleriffic</a></h1>
-				<h2>Set to adapt to image and web browser size; touch can be enabled</h2>
+				<h2>Set to adapt to image and web browser size; touch is enabled</h2>
 
 				<!-- Start Advanced Gallery Html Containers -->
 				<div id="gallery" class="content group">
@@ -33,13 +34,13 @@
 						<div id="nav" class="controls"></div>
 						<div class="photo-index" style="visibility: hidden; margin: 0 auto; padding-top: 5px"></div>
 					</div>
-					<div class="slideshow-container group swipeable">
+					<div class="slideshow-container group">
 						<div id="image_loading" class="loader"></div>
 						<div id="slideshow" class="slideshow"></div>
 						<div id="caption" class="caption-container group resize_text"></div>
 					</div>
 				</div>
-				<div id="thumbs" class="navigation swipeable">
+				<div id="thumbs" class="navigation">
 						<a class="pageLink prev" style="visibility: hidden;" href="#" title="Previous Page"></a>
 						<ul class="thumbs noscript">
 
@@ -402,7 +403,6 @@
 					prevPageLinkText:          '&lsaquo; Prev',
 					enableHistory:             true,
 					autoStart:                 false,
-					enableSwipeNavigation:     false, /* set true and include jquery.touchSwipe.min.js to enable */
 					syncTransitions:           true,
 					defaultTransitionDuration: 900,
 					onSlideChangeOut:             function(prevIndex) {
@@ -540,36 +540,71 @@
 					e.preventDefault();
 				});
 
+					/** Handle touch swipe events **/
+				$('.slideshow-container').swipe({
+					// swipe events for images (on container to allow swiping on empty space; important not to allow up/down so page scroll works)
+					swipeLeft:function(event, direction, distance, duration, fingerCount) {
+						if (fingerCount==1)  gallery.next();
+					},
+					swipeRight:function(event, direction, distance, duration, fingerCount) {
+						if (fingerCount==1)  gallery.previous();
+					},
+					pinchIn: function(event, direction, distance, duration, fingerCount, pinchZoom) {
+						window.location.href = $('div.caption-container').find('.download a').attr('href'); // open full size image
+					},
+					fingers: $.fn.swipe.fingers.ALL,
+					excludedElements: "button, input, select, textarea, .noSwipe", // NOT a
+					threshold: 75
+				});
+
+				$('#thumbs').swipe({
+					// swipe events for thumbs (disabled in concise mode with thumb scroll)
+					swipeLeft:function(event, direction, distance, duration, fingerCount) {
+						gallery.nextPage();
+					},
+					swipeRight:function(event, direction, distance, duration, fingerCount) {
+						gallery.previousPage();
+					},
+					swipeUp:function(event, direction, distance, duration, fingerCount) {
+						gallery.nextPage();
+					},
+					swipeDown:function(event, direction, distance, duration, fingerCount) {
+						gallery.previousPage();
+					},
+					fingers: 1,
+					excludedElements: "button, input, select, textarea, .noSwipe", // NOT a
+					threshold: 75
+				});
 
 				/**** Functions to support integration of galleriffic with the jquery.history plugin ****/
 
-	// This function is called after calling ???.init(), after calling ???.load(), and/or after pushing "Go Back" button of a browser
-	function pageload(hash) {
-		// alert("pageload: " + hash);
-		// hash doesn't contain the first # character.
-		if(hash) {
-			$.galleriffic.gotoImage(hash);
-		} else {
-			gallery.gotoIndex(0, false, true);
-		}
-	}
+				// This function is called after calling ???.init(), after calling ???.load(), and/or after pushing "Go Back" button of a browser
+				function pageload(hash) {
+					// alert("pageload: " + hash);
+					// hash doesn't contain the first # character.
+					if(hash) {
+						$.galleriffic.gotoImage(hash);
+					} else {
+						gallery.gotoIndex(0, false, true);
+					}
+				}
 
-	// Initialize history plugin; causes the callback to be called by present location.hash.
-	$.history.init(pageload);
+				// Initialize history plugin; causes the callback to be called by present location.hash.
+				$.history.init(pageload);
 
-	// set onlick event for buttons using the jQuery on method
-	$("a[rel='history']").on('click', function(e) {
-		if (e.button != 0) return true;
+				// set onlick event for buttons using the jQuery on method
+				$("a[rel='history']").on('click', function(e) {
+					if (e.button != 0) return true;
 
-		var hash = this.href;
-		hash = hash.replace(/^.*#/, '');
+					var hash = this.href;
+					hash = hash.replace(/^.*#/, '');
 
-		// moves to a new page, where pageload is called at once.
-		// hash mustn't contain "#", "?"
-		$.history.load(hash);
+					// moves to a new page, where pageload is called at once.
+					// hash mustn't contain "#", "?"
+					$.history.load(hash);
 
-		return false;
-	});
+					return false;
+				});
 
 				/****************************************************************************************/
 			});

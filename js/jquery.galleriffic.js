@@ -8,7 +8,7 @@
  * Much thanks to primary contributer Ponticlaro (http://www.ponticlaro.com)
  *
  * Modified by Jay Hayes (http://iamvery.com)
- * Modified by Justin Briggs (http://trialsandtravails.blogspot.com)
+ * Modified by Justin Briggs (http://trialstravails.blogspot.com)
  */
 ;(function($) {
 	// Globally keep track of all images by their unique hash.  Each item is an image data object.
@@ -89,12 +89,13 @@
  		nextLinkText:              'Next',
 		nextLinkTitle:             undefined,
 		nextPageLinkText:          'Next &rsaquo;',
+		nextPageLinkTitle:         undefined,
 		prevPageLinkText:          '&lsaquo; Prev',
+		prevPageLinkTitle:         undefined,
 		enableHistory:             false,
 		enableFancybox:            false,
 		fancyOptions:              {}, 
 		enableKeyboardNavigation:  true,
-		enableSwipeNavigation:     false,
 		autoStart:                 false,
 		syncTransitions:           false,
 		defaultTransitionDuration: 1000,
@@ -705,10 +706,10 @@
 					//console.log("width: "+ cnWidth);
 					//console.log("height: "+ cnHeight);
 					
-					$(".slideshow").stop().animate({
+					$("#slideshow").stop().animate({
 						height: cnHeight,
 						width: cnWidth
-					}, 1000); 
+					}, this.defaultTransitionDuration/2);
 				}
 				/* -------------------------------------------------- */
 
@@ -772,6 +773,7 @@
 			imageResize: function(w, h, t)
 			{
 				var frac = Math.min( 1.0, t/w );
+				var frac = Math.min( frac, t/h ); // on portrait images, downsize same amount as if it were landscape
 				var size = {
 					width   : Math.round(w * frac),
 					height  : Math.round(h * frac)
@@ -894,7 +896,7 @@
 				// Prev Page Link
 				if (page > 0) {
 					var prevPage = startIndex - this.numThumbs;
-					pager.append('<a rel="history" href="#'+this.data[prevPage].hash+'" title="'+this.prevPageLinkText+'">'+this.prevPageLinkText+'</a>');
+					pager.append('<a class="prev" rel="history" href="#'+this.data[prevPage].hash+'" title="'+this.prevPageLinkTitle+'">'+this.prevPageLinkText+'</a>');
 				}
 
 				// Create First Page link if needed
@@ -925,7 +927,7 @@
 				// Next Page Link
 				var nextPage = startIndex + this.numThumbs;
 				if (nextPage < this.data.length) {
-					pager.append('<a rel="history" href="#'+this.data[nextPage].hash+'" title="'+this.nextPageLinkText+'">'+this.nextPageLinkText+'</a>');
+					pager.append('<a class="next" rel="history" href="#'+this.data[nextPage].hash+'" title="'+this.nextPageLinkTitle+'">'+this.nextPageLinkText+'</a>');
 				}
 
 				pager.find('a').click(function(e) {
@@ -946,7 +948,7 @@
 					pager.append('<span class="current">'+pageLabel+'</span>');
 				else if (pageNum < numPages) {
 					var imageIndex = pageNum*this.numThumbs;
-					pager.append('<a rel="history" href="#'+this.data[imageIndex].hash+'" title="'+pageLabel+'">'+pageLabel+'</a>');
+					pager.append('<a rel="history" href="#'+this.data[imageIndex].hash+'">'+pageLabel+'</a>');
 				}
 				
 				return this;
@@ -959,6 +961,8 @@
 		if (!this.nextLinkTitle) { this.nextLinkTitle = this.nextLinkText; }
  		if (!this.playLinkTitle) { this.playLinkTitle = this.playLinkText; }
  		if (!this.pauseLinkTitle) { this.pauseLinkTitle = this.pauseLinkText; }
+		if (!this.nextPageLinkTitle) { this.nextPageLinkTitle = this.nextPageLinkText; }
+		if (!this.prevPageLinkTitle) { this.prevPageLinkTitle = this.prevPageLinkText; }
 		
 		// Verify the history plugin is available
 		if (this.enableHistory && !$.history.init)
@@ -993,10 +997,10 @@
 			this.$ssControlsContainer = $(this.ssControlsContainerSel).empty();
 			if (this.autoStart) {
 				this.$ssControlsContainer
-					.append('<div class="ss-controls"><a href="#pause" class="pause" title="'+this.pauseLinkText+'">'+this.pauseLinkText+'</a></div>');
+					.append('<div class="ss-controls"><a href="#pause" class="pause" title="'+this.pauseLinkTitle+'">'+this.pauseLinkText+'</a></div>');
 			} else {
 				this.$ssControlsContainer
-					.append('<div class="ss-controls"><a href="#play" class="play" title="'+this.playLinkText+'">'+this.playLinkText+'</a></div>');
+					.append('<div class="ss-controls"><a href="#play" class="play" title="'+this.playLinkTitle+'">'+this.playLinkText+'</a></div>');
 			}
         
 			this.$ssControlsContainer.find('div.ss-controls a')
@@ -1032,10 +1036,11 @@
 		// Setup Keyboard Navigation
 		if (this.enableKeyboardNavigation) {
 			$(document).keydown(function(e) {
+				if (e.altKey || e.ctrlKey || e.shiftKey) return; // ignore special combinations
 				var key = e.charCode ? e.charCode : e.keyCode ? e.keyCode : 0;
 				switch(key) {
 					case 32: // space
-						gallery.next();
+						gallery.toggleSlideshow();
 						e.preventDefault();
 						break;
 					case 33: // Page Up
@@ -1065,38 +1070,17 @@
 				}
 			});
 		}
-
-		if (this.enableSwipeNavigation) {
-			$(".swipeable").swipe({
-				swipeLeft:function(event, direction, distance, duration, fingerCount) {
-					//This only fires when the user swipes left. Could be on image or thumbs.
-					if (event.currentTarget.id == "thumbs") {
-						gallery.nextPage();
-					} else {
-						gallery.next();
-					}
-				},
-				swipeRight:function(event, direction, distance, duration, fingerCount) {
-					//This only fires when the user swipes right. Could be on image or thumbs.
-					if (event.currentTarget.id == "thumbs") {
-						gallery.previousPage();
-					} else {
-						gallery.previous();
-					}
-				}, 
-				fingers: 1, // with one finger only
-				excludedElements: "button, input, select, textarea, .noSwipe", // NOT a
-				threshold: 75
-			});
-		}
         
-		// Auto start the slideshow
-		if (this.autoStart)
-			this.play();
+		// Perform these functions once the page is loaded (and prevent delaying load)
+		$(window).load( function() {
+			// Auto start the slideshow
+			if (this.autoStart)
+				this.play();
 
-		// Kickoff Image Preloader after 1 second
-		setTimeout(function() { gallery.preloadInit(); }, 1000);
-
+			// Kickoff the image preloader
+			gallery.preloadInit();
+		} );
+		
 		return this;
 	};
 })(jQuery);
