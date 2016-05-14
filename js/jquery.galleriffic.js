@@ -42,7 +42,7 @@
 
 			var gallery = imageData.gallery;
 			gallery.gotoImage(imageData);
-			
+
 			return true;
 		},
 
@@ -73,7 +73,8 @@
 		enableTopPager:            false,
 		enableBottomPager:         true,
 		maxPagesToShow:            7,
-		imageBorderWidth:          0, // space for box shadow and border, in pixels
+		imageBorderWidth:          0, // horizontal space for box shadow and border, in pixels
+		imageBorderHeight:         0, // vertical space for box shadow and border, in pixels
 		imageContainerSel:         '',
 		captionContainerSel:       '',
 		ssControlsContainerSel:    '',
@@ -82,11 +83,11 @@
 		loadingContainerSel:       '',
 		playLinkText:              'Play',
 		playLinkTitle:             undefined,
- 		pauseLinkText:             'Pause',
+		pauseLinkText:             'Pause',
 		pauseLinkTitle:            undefined,
- 		prevLinkText:              'Previous',
+		prevLinkText:              'Previous',
 		prevLinkTitle:             undefined,
- 		nextLinkText:              'Next',
+		nextLinkText:              'Next',
 		nextLinkTitle:             undefined,
 		nextPageLinkText:          'Next &rsaquo;',
 		nextPageLinkTitle:         undefined,
@@ -94,7 +95,7 @@
 		prevPageLinkTitle:         undefined,
 		enableHistory:             false,
 		enableFancybox:            false,
-		fancyOptions:              {}, 
+		fancyOptions:              {},
 		enableKeyboardNavigation:  true,
 		autoStart:                 false,
 		syncTransitions:           false,
@@ -160,7 +161,7 @@
 			// @param {Boolean} insert Specifies whether the the image is appended to the end or inserted into the gallery.
 			// @param {Integer} position The index within the gallery where the item shouold be added.
 			addImage: function(listItem, thumbExists, insert, position) {
-				var $li = ( typeof listItem === "string" ) ? $(listItem) : listItem;				
+				var $li = ( typeof listItem === "string" ) ? $(listItem) : listItem;
 				var $aThumb = $li.find('a.thumb');
 				var slideUrl = $aThumb.attr('href');
 				var title = $aThumb.attr('title');
@@ -179,7 +180,7 @@
 				// Set position to end when not specified
 				if (!insert)
 					position = this.data.length;
-				
+
 				var imageData = {
 					title:title,
 					slideUrl:slideUrl,
@@ -212,7 +213,7 @@
 							$thumbsUl.children(':eq('+position+')').before($li);
 						else
 							$thumbsUl.append($li);
-						
+
 						if (gallery.onImageAdded)
 							gallery.onImageAdded(imageData, $li);
 					});
@@ -237,13 +238,13 @@
 			removeImageByIndex: function(index) {
 				if (index < 0 || index >= this.data.length)
 					return false;
-				
+
 				var imageData = this.data[index];
 				if (!imageData)
 					return false;
-				
+
 				this.removeImage(imageData);
-				
+
 				return true;
 			},
 
@@ -255,13 +256,13 @@
 			// Removes an image from the gallery.
 			removeImage: function(imageData) {
 				var index = imageData.index;
-				
+
 				// Remove the image from the gallery data array
 				this.data.splice(index, 1);
-				
+
 				// Remove the global registration
 				delete allImages[''+imageData.hash];
-				
+
 				// Remove the image's list item from the DOM
 				this.updateThumbs(function() {
 					var $li = gallery.find('ul.thumbs')
@@ -283,7 +284,7 @@
 				for (i = startIndex; i < this.data.length; i++) {
 					this.data[i].index = i;
 				}
-				
+
 				return this;
 			},
 
@@ -304,7 +305,7 @@
 			// Initalizes the image preloader
 			preloadInit: function() {
 				if (this.preloadAhead == 0) return this;
-				
+
 				this.preloadStartIndex = this.currentImage.index;
 				var nextIndex = this.getNextIndex(this.preloadStartIndex);
 				return this.preloadRecursive(this.preloadStartIndex, nextIndex);
@@ -346,11 +347,11 @@
 
 				// If already loaded, continue
 				if (imageData.image)
-					return this.preloadNext(startIndex, currentIndex); 
-				
+					return this.preloadNext(startIndex, currentIndex);
+
 				// Preload the image
 				var image = document.createElement("img");
-				
+
 				image.onload = function() {
 					imageData.image = this;
 					gallery.preloadNext(startIndex, currentIndex);
@@ -361,7 +362,7 @@
 
 				return this;
 			},
-			
+
 			// Called by preloadRecursive in order to preload the next image after the previous has loaded.
 			// @param {Integer} startIndex The index of the first image the current preloader started on.
 			// @param {Integer} currentIndex The index of the current image to preload.
@@ -411,7 +412,7 @@
 						.attr('href', '#play')
 						.html(this.playLinkText);
 				}
-				
+
 				return this;
 			},
 
@@ -457,7 +458,7 @@
 
 			// Advances the gallery to the next image.
 			// @param {Boolean} dontPause Specifies whether to pause the slideshow.
-			// @param {Boolean} bypassHistory Specifies whether to delegate navigation to the history plugin when history is enabled.  
+			// @param {Boolean} bypassHistory Specifies whether to delegate navigation to the history plugin when history is enabled.
 			next: function(dontPause, bypassHistory) {
 				this.transitionDirection = 'next';
 				this.gotoIndex(this.getNextIndex(this.currentImage.index), dontPause, bypassHistory);
@@ -495,10 +496,10 @@
 				var page = this.getCurrentPage();
 				if (page > 0) {
 					var startIndex = page * this.numThumbs;
-					var prevPage = startIndex - this.numThumbs;				
+					var prevPage = startIndex - this.numThumbs;
 					this.gotoIndex(prevPage, dontPause, bypassHistory);
 				}
-				
+
 				return this;
 			},
 
@@ -509,12 +510,12 @@
 			gotoIndex: function(index, dontPause, bypassHistory) {
 				if (!dontPause)
 					this.pause();
-				
+
 				if (index < 0) index = 0;
 				else if (index >= this.data.length) index = this.data.length-1;
-				
+
 				var imageData = this.data[index];
-				
+
 				if (!bypassHistory && this.enableHistory)
 					$.history.load(String(imageData.hash));  // At the moment, history.load only accepts string arguments
 				else
@@ -527,7 +528,7 @@
 			// @param {Object} imageData An object holding the image metadata of the image to navigate to.
 			gotoImage: function(imageData) {
 				var index = imageData.index;
-			
+
 				var tomod = index % this.numThumbs;
 				var doslidein = true;
 				if (this.currentImage && this.currentImage.index != index) {
@@ -540,18 +541,18 @@
 				if (!this.currentImage || this.currentImage.index != index) {
 					this.currentImage = imageData;
 					this.preloadRelocate(index);
-				
+
 					this.refresh();
-					
+
 					if (doslidein)
 						if (this.onSlideChangeIn)
 							this.onSlideChangeIn(this.currentImage.index);
-						else
-							this.find('ul.thumbs').children().eq(this.currentImage.index).css({'opacity' : 1});
-					
+						//else
+						//	this.find('ul.thumbs').children().eq(this.currentImage.index).css({'opacity' : 1});
+
 					if (this.$photoIndexContainer)
 						this.$photoIndexContainer.html(''+ (this.currentImage.index+1) +' of '+ this.data.length);
-					
+
 					this.transitionDirection = undefined;
 				}
 				return this;
@@ -642,7 +643,7 @@
 
 				if (!imageData.image) {
 					var image = document.createElement("img");
-					
+
 					// Wire up mainImage onload event
 					image.onload = function() {
 						imageData.image = this;
@@ -689,33 +690,30 @@
 						.click(function() {gallery.next()});
 				}
 
-				/* Change the size of slideshow-container dynamically, if image is in a gallery */
-				if ($("#gallery").length>0) {
-					// Save actual image size so any rescaling we do now is reversible and doesn't alter later image loads
-					if (!imageData.image.trueWidth) { imageData.image.trueWidth = imageData.image.width; }
-					if (!imageData.image.trueHeight) { imageData.image.trueHeight = imageData.image.height; }
-					
-					var size = this.imageResize(imageData.image.trueWidth, imageData.image.trueHeight, $("#gallery").outerWidth()-this.imageBorderWidth);
-					//console.log("outerwidth: " + $("#gallery").outerWidth());
-					
-					imageData.image.width = size.width;
-					imageData.image.height = size.height;
-					
-					var cnWidth = size.width + this.imageBorderWidth; 
-					var cnHeight = size.height + this.imageBorderWidth;
-					//console.log("width: "+ cnWidth);
-					//console.log("height: "+ cnHeight);
-					
-					$("#slideshow").stop().animate({
-						height: cnHeight,
-						width: cnWidth
-					}, this.defaultTransitionDuration/2);
-				}
-				/* -------------------------------------------------- */
+				/* Change the size of slideshow-container dynamically */
+				// Save actual image size so any rescaling we do now is reversible and doesn't alter later image loads
+				if (!imageData.image.trueWidth) { imageData.image.trueWidth = imageData.image.width; }
+				if (!imageData.image.trueHeight) { imageData.image.trueHeight = imageData.image.height; }
+
+				// The first load, it may be slightly too large because it fails to account for the right scroll bar that may appear:
+				var maxWidth = $("#gallery").outerWidth() - this.imageBorderWidth;
+				var viewportHeightAvail = document.documentElement.clientHeight - this.imageBorderHeight - 10;
+				var size = this.imageResize(imageData.image.trueWidth, imageData.image.trueHeight, maxWidth, viewportHeightAvail);
+
+				imageData.image.width = size.width;
+				imageData.image.height = size.height;
+
+				var cnWidth = size.width + this.imageBorderWidth;
+				var cnHeight = size.height + this.imageBorderHeight;
+
+				$("#slideshow").stop().animate({
+					height: cnHeight,
+					width: cnWidth
+				}, this.defaultTransitionDuration/2
 
 				newSlide.find('a')
 					.append(imageData.image);
-				
+
 				var newCaption = 0;
 				if (this.$captionContainer) {
 					// Construct new hidden caption for the image
@@ -738,7 +736,7 @@
 					if (newCaption)
 						newCaption.fadeTo(this.getDefaultTransitionDuration(isSync), 1.0);
 				}
-				
+
 				if (this.isSlideshowRunning) {
 					if (this.slideshowTimeout)
 						clearTimeout(this.slideshowTimeout);
@@ -768,12 +766,12 @@
 
 				return this;
 			},
-			
-			// get image size to retain aspect ratio; t==available width
-			imageResize: function(w, h, t)
+
+			// get image size to retain aspect ratio; aw==available width, ah=available height
+			imageResize: function(w, h, aw, ah)
 			{
-				var frac = Math.min( 1.0, t/w );
-				var frac = Math.min( frac, t/h ); // on portrait images, downsize same amount as if it were landscape
+				var frac = Math.min( 1.0, aw/w, aw/h ); // on portrait images, downsize same amount as if it were landscape
+				frac = Math.min( frac, ah/h ); // but only downsize based upon height if height would exceed available height
 				var size = {
 					width   : Math.round(w * frac),
 					height  : Math.round(h * frac)
@@ -792,7 +790,7 @@
 					// Call the Post-transition Out Handler
 					if (postTransitionOutHandler)
 						postTransitionOutHandler();
-					
+
 					gallery.rebuildThumbs();
 
 					// Transition In the thumbsContainer
@@ -821,7 +819,7 @@
 				var $topPager = this.find('div.top');
 				if ($topPager.length > 0)
 					$topPager.empty();
-				
+
 				if (this.enableTopPager) {
 					if ($topPager.length == 0)
 						$topPager = this.prepend('<div class="top pagination"></div>').find('div.top');
@@ -834,7 +832,7 @@
 				var $bottomPager = this.find('div.bottom');
 				if ($bottomPager.length > 0)
 					$bottomPager.empty();
-				
+
 				if (this.enableBottomPager) {
 					if ($bottomPager.length == 0)
 						$bottomPager = this.append('<div class="bottom pagination"></div>').find('div.bottom');
@@ -863,7 +861,7 @@
 
 				// Remove the noscript class from the thumbs container ul
 				$thumbsUl.removeClass('noscript');
-				
+
 				return this;
 			},
 
@@ -880,7 +878,7 @@
 				var page = this.getCurrentPage();
 				var startIndex = page * this.numThumbs;
 				var pagesRemaining = this.maxPagesToShow - 1;
-				
+
 				var pageNum = page - Math.floor((this.maxPagesToShow - 1) / 2) + 1;
 				if (pageNum > 0) {
 					var remainingPageCount = numPages - pageNum;
@@ -904,7 +902,7 @@
 					this.buildPageLink(pager, 0, numPages);
 					if (pageNum > 1)
 						pager.append('<span class="ellipsis">&hellip;</span>');
-					
+
 					pagesRemaining--;
 				}
 
@@ -950,7 +948,7 @@
 					var imageIndex = pageNum*this.numThumbs;
 					pager.append('<a rel="history" href="#'+this.data[imageIndex].hash+'">'+pageLabel+'</a>');
 				}
-				
+
 				return this;
 			}
 		});
@@ -959,29 +957,29 @@
 		$.extend(this, defaults, settings);
 		if (!this.prevLinkTitle) { this.prevLinkTitle = this.prevLinkText; }
 		if (!this.nextLinkTitle) { this.nextLinkTitle = this.nextLinkText; }
- 		if (!this.playLinkTitle) { this.playLinkTitle = this.playLinkText; }
- 		if (!this.pauseLinkTitle) { this.pauseLinkTitle = this.pauseLinkText; }
+		if (!this.playLinkTitle) { this.playLinkTitle = this.playLinkText; }
+		if (!this.pauseLinkTitle) { this.pauseLinkTitle = this.pauseLinkText; }
 		if (!this.nextPageLinkTitle) { this.nextPageLinkTitle = this.nextPageLinkText; }
 		if (!this.prevPageLinkTitle) { this.prevPageLinkTitle = this.prevPageLinkText; }
-		
+
 		// Verify the history plugin is available
 		if (this.enableHistory && !$.history.init)
 			this.enableHistory = false;
-		
+
 		// Verify the fancybox plugin is available
 		if (this.enableFancybox && !$.fancybox)
 			this.enableFancybox = false;
-		
+
 		// Select containers
 		if (this.imageContainerSel) this.$imageContainer = $(this.imageContainerSel);
 		if (this.captionContainerSel) this.$captionContainer = $(this.captionContainerSel);
 		if (this.loadingContainerSel) this.$loadingContainer = $(this.loadingContainerSel);
 		if (this.photoIndexContainerSel) this.$photoIndexContainer = $(this.photoIndexContainerSel);
-		
+
 
 		// Initialize the thumbails
 		this.initializeThumbs();
-		
+
 		if (this.maxPagesToShow < 3)
 			this.maxPagesToShow = 3;
 
@@ -1002,7 +1000,7 @@
 				this.$ssControlsContainer
 					.append('<div class="ss-controls"><a href="#play" class="play" title="'+this.playLinkTitle+'">'+this.playLinkText+'</a></div>');
 			}
-        
+
 			this.$ssControlsContainer.find('div.ss-controls a')
 				.click(function(e) {
 					gallery.toggleSlideshow();
@@ -1010,7 +1008,7 @@
 					return false;
 				});
 		}
-		
+
 		if (this.navControlsContainerSel) {
 			this.$navControlsContainer = $(this.navControlsContainerSel).empty();
 			this.$navControlsContainer
@@ -1070,7 +1068,7 @@
 				}
 			});
 		}
-        
+
 		// Perform these functions once the page is loaded (and prevent delaying load)
 		$(window).load( function() {
 			// Auto start the slideshow
@@ -1080,7 +1078,7 @@
 			// Kickoff the image preloader
 			gallery.preloadInit();
 		} );
-		
+
 		return this;
 	};
 })(jQuery);
